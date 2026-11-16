@@ -37,8 +37,8 @@ SQLite Checkpoint / Memory
 ## Tech stack
 
 - **LangGraph** — Self-RAG workflow, conditional routing, persistent thread state
-- **OpenAI `gpt-5-mini`** — routing, query rewriting, generation, relevance grading, IsSUP and IsUSE
-- **OpenAI `text-embedding-3-large`** — embeddings for private operational documents
+- **Groq `qwen/qwen3.8-27b`** — routing, query rewriting, generation, relevance grading, IsSUP and IsUSE
+- **Groq `sentence-transformers/all-MiniLM-L6-v2"`** — embeddings for private operational documents
 - **Pinecone** — private runbooks/SOPs/postmortems knowledge base
 - **Tavily** — controlled internet-search fallback
 - **SQLite** — LangGraph persistence memory + simple audit database for the demo
@@ -49,7 +49,7 @@ SQLite Checkpoint / Memory
 ## Project structure
 
 ```text
-CloudOps-Sentinel-Enterprise-Incident-Response-Self-RAG-Copilot/
+ReflactAi-Enterprise-Incident-Response-Self-RAG-Copilot/
 ├── app.py
 ├── data_ingestion.py          # ONE file to build the Pinecone KB
 ├── src/
@@ -101,7 +101,7 @@ pip install -r requirements.txt
 Copy `.env.example` to `.env` and configure:
 
 ```env
-OPENAI_API_KEY=...
+Groq_API_KEY=...
 PINECONE_API_KEY=...
 TAVILY_API_KEY=...
 ```
@@ -109,10 +109,10 @@ TAVILY_API_KEY=...
 The defaults are:
 
 ```env
-OPENAI_MODEL=gpt-5-mini
-EMBEDDING_MODEL=text-embedding-3-large
-EMBEDDING_DIMENSION=3072
-PINECONE_INDEX_NAME=cloudops-sentinel-openai-self-rag
+GROQ_MODEL="qwen/qwen3.8-27b"
+EMBEDDING_MODEL="sentence-transformers/all-MiniLM-L6-v2"
+EMBEDDING_DIMENSION=384
+PINECONE_INDEX_NAME="reflactai"
 PINECONE_NAMESPACE=incident-runbooks
 ```
 
@@ -137,7 +137,7 @@ Load ./documents
   ↓
 Split documents into chunks
   ↓
-OpenAI text-embedding-3-large
+sentence-transformers/all-MiniLM-L6-v2"
   ↓
 Upsert to Pinecone
   ↓
@@ -163,7 +163,7 @@ uvicorn app:app --reload
 Open:
 
 ```text
-http://127.0.0.1:8000
+http://127.0.0.1:5000
 ```
 
 ## Add new documents from the UI
@@ -184,7 +184,7 @@ FastAPI /api/upload
       ↓
 Document Loader + Chunking
       ↓
-OpenAI Embeddings
+Embeddings
       ↓
 EXISTING Pinecone Index
       ↓
@@ -245,7 +245,7 @@ Ask about a technical issue that is not covered by any private runbook. Self-RAG
 
 The application and ingestion script both import `src/vectorstore.py`. That means they always use the same:
 
-- OpenAI embedding model
+- embedding model
 - embedding dimension
 - Pinecone index
 - Pinecone namespace
