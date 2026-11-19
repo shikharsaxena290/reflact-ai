@@ -16,4 +16,8 @@ COPY . .
 EXPOSE 10000
 
 
+<<<<<<< HEAD
 CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-10000}"]
+=======
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port ${PORT:-10000}"]
+>>>>>>> 4c20006 (updated new changes)
