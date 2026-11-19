@@ -13,12 +13,12 @@ class Settings(BaseModel):
     # OpenAI
     groq_api_key: str = os.getenv("GROQ_API_KEY", "")
     groq_model: str = os.getenv("GROQ_MODEL", "qwen/qwen3.8-27b")
-    embedding_model: str = os.getenv("EMBEDDING_MODEL", "text-embedding-3-large")
-    embedding_dimension: int = int(os.getenv("EMBEDDING_DIMENSION", "3072"))
+    embedding_model: str = os.getenv("EMBEDDING_MODEL", "sentence-transformers/all-MiniLM-L6-v2")
+    embedding_dimension: int = int(os.getenv("EMBEDDING_DIMENSION", "384"))
 
     # Pinecone
     pinecone_api_key: str = os.getenv("PINECONE_API_KEY", "")
-    pinecone_index_name: str = os.getenv("PINECONE_INDEX_NAME", "cloudops-sentinel-openai-self-rag")
+    pinecone_index_name: str = os.getenv("PINECONE_INDEX_NAME", "reflactai")
     pinecone_namespace: str = os.getenv("PINECONE_NAMESPACE", "incident-runbooks")
     pinecone_cloud: str = os.getenv("PINECONE_CLOUD", "aws")
     pinecone_region: str = os.getenv("PINECONE_REGION", "us-east-1")
