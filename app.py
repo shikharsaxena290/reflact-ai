@@ -59,20 +59,66 @@ async def chat(payload: ChatRequest):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# @app.post("/api/upload", response_model=UploadResponse)
+# async def upload(file: UploadFile = File(...)):
+#     suffix = Path(file.filename or "").suffix.lower()
+#     if suffix not in SUPPORTED:
+#         raise HTTPException(status_code=400, detail="Supported: PDF, TXT, MD, DOCX")
+#     safe_name = Path(file.filename).name
+#     target = UPLOADS / safe_name
+#     with target.open("wb") as f:
+#         shutil.copyfileobj(file.file, f)
+#     try:
+#         count = await run_in_threadpool(ingest_file, target)
+#         return UploadResponse(filename=safe_name, chunks_indexed=count, namespace=namespace())
+#     except Exception as e:
+#         raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.post("/api/upload", response_model=UploadResponse)
 async def upload(file: UploadFile = File(...)):
-    suffix = Path(file.filename or "").suffix.lower()
-    if suffix not in SUPPORTED:
-        raise HTTPException(status_code=400, detail="Supported: PDF, TXT, MD, DOCX")
-    safe_name = Path(file.filename).name
-    target = UPLOADS / safe_name
-    with target.open("wb") as f:
-        shutil.copyfileobj(file.file, f)
     try:
+        # Validate file
+        suffix = Path(file.filename or "").suffix.lower()
+
+        if suffix not in SUPPORTED:
+            raise HTTPException(
+                status_code=400,
+                detail="Supported: PDF, TXT, MD, DOCX"
+            )
+
+        # Ensure upload directory exists
+        UPLOADS.mkdir(parents=True, exist_ok=True)
+
+        # Save file
+        safe_name = Path(file.filename or "upload").name
+        target = UPLOADS / safe_name
+
+        content = await file.read()
+
+        with target.open("wb") as f:
+            f.write(content)
+
+        # Generate embeddings and index document
         count = await run_in_threadpool(ingest_file, target)
-        return UploadResponse(filename=safe_name, chunks_indexed=count, namespace=namespace())
+
+        return UploadResponse(
+            filename=safe_name,
+            chunks_indexed=count,
+            namespace=namespace()
+        )
+
+    except HTTPException:
+        raise
+
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        import logging
+        logging.exception("Document upload/indexing failed")
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
 
 
 @app.get("/api/audits")
