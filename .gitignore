@@ -1,3 +1,7 @@
-venv
-prac.ipynb
 .env
+__pycache__/
+*.pyc
+data/*.sqlite*
+data/*.db
+venv/
+.venv/
